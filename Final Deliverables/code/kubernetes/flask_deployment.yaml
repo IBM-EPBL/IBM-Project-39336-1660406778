@@ -1,0 +1,57 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: flask-app
+
+# spec:
+#   replicas: 3
+#   selector:
+#     matchLabels:
+#       app: flask-app
+#   template:
+#     metadata:
+#       labels:
+#         app: flask-app
+
+#     spec:
+#       containers:
+#         - name: flask-app-container
+#           image: flask-app-testing
+#           imagePullPolicy: Never
+#           ports:
+#             - containerPort: 5000
+#               protocol: TCP
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-test-service
+spec:
+  selector:
+    app: flask-test-app
+  ports:
+    - protocol: "TCP"
+      port: 6000
+      targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-test-app
+spec:
+  selector:
+    matchLabels:
+      app: flask-test-app
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: flask-test-app
+    spec:
+      containers:
+        - name: flask-test-app
+          image: docker.io/vik8/flask_with_form_and_docker
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
